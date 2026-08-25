@@ -79,11 +79,11 @@ undefine CONF_PATH
 # binary packages are still produced on the x86 architectures where the
 # corresponding virtual machines run.
 ifeq ($(DEB_BUILD_ARCH),amd64)
-	OVMF_BUILD_TARGETS = build-ovmf build-ovmf32
+OVMF_BUILD_TARGETS = build-ovmf build-ovmf32
 else ifeq ($(DEB_BUILD_ARCH),i386)
-	OVMF_BUILD_TARGETS = build-ovmf32
+OVMF_BUILD_TARGETS = build-ovmf32
 else
-	OVMF_BUILD_TARGETS =
+OVMF_BUILD_TARGETS =
 endif
 
 override_dh_auto_build: build-qemu-efi-aarch64 build-qemu-efi-arm $(OVMF_BUILD_TARGETS) build-qemu-efi-loongarch64 build-qemu-efi-riscv64
