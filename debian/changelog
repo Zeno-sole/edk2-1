@@ -1,3 +1,23 @@
+edk2 (2024.08-2deepin6) unstable; urgency=medium
+
+  * Fix edk2 binary package build on loongarch64
+    - Skip build-ovmf and build-ovmf32 on non-x86 build hosts (arm64,
+      loongarch64, riscv64, ...)
+    - OVMF (X64) and OVMF32 (IA32) use native x86 compiler options
+      (-m64/-m32, -march=x86-64, -mcmodel=small, -maccumulate-outgoing-args,
+      -mno-red-zone, -mno-mmx, -mno-sse) that are not supported by non-x86
+      compilers
+    - On loong64 the OVMF X64 build previously fell back to the native
+      LoongArch gcc and failed with:
+        gcc: error: unrecognized argument in option '-march=x86-64'
+        error F002: Failed to build module
+    - Gate build-ovmf/build-ovmf32 on DEB_BUILD_ARCH=amd64 so OVMF/OVMF32
+      firmwares continue to be produced on x86 build hosts
+    - qemu-efi-loongarch64, qemu-efi-riscv64, qemu-efi-aarch64 and qemu-efi-arm
+      are still built on all architectures
+
+ -- lichenggang <lichenggang@uniontech.com>  Tue, 25 Aug 2026 11:08:00 +0800
+
 edk2 (2024.08-2deepin5) unstable; urgency=medium
 
   * Add loongarch64 support:

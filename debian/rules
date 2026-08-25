@@ -65,7 +65,28 @@ undefine CONF_PATH
 %:
 	dh $@
 
-override_dh_auto_build: build-qemu-efi-aarch64 build-qemu-efi-arm build-ovmf build-ovmf32 build-qemu-efi-loongarch64 build-qemu-efi-riscv64
+# The OVMF (X64) and OVMF32 (IA32) firmwares are built with native x86
+# compiler options (-m64/-m32, -march=x86-64, -mcmodel=small,
+# -maccumulate-outgoing-args, -mno-red-zone, -mno-mmx, -mno-sse, ...)
+# that are not supported by compilers for other architectures. They can
+# therefore only be produced on x86 build hosts (amd64/i386), where the
+# native gcc is already an x86 compiler. On every other build host
+# (arm64, loongarch64, riscv64, ...) GCC5 has no *_X64/_IA32_PREFIX set,
+# so the OVMF build falls back to the native host gcc (e.g. LoongArch gcc
+# on loong64) and fails with "unrecognized argument in option
+# '-march=x86-64'". Skip build-ovmf/build-ovmf32 unless building on an
+# x86 architecture. The ovmf, ovmf-ia32, efi-shell-x64 and efi-shell-ia32
+# binary packages are still produced on the x86 architectures where the
+# corresponding virtual machines run.
+ifeq ($(DEB_BUILD_ARCH),amd64)
+	OVMF_BUILD_TARGETS = build-ovmf build-ovmf32
+else ifeq ($(DEB_BUILD_ARCH),i386)
+	OVMF_BUILD_TARGETS = build-ovmf32
+else
+	OVMF_BUILD_TARGETS =
+endif
+
+override_dh_auto_build: build-qemu-efi-aarch64 build-qemu-efi-arm $(OVMF_BUILD_TARGETS) build-qemu-efi-loongarch64 build-qemu-efi-riscv64
 
 debian/setup-build-stamp:
 	set -e; . ./edksetup.sh; \
