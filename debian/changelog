@@ -11,8 +11,14 @@ edk2 (2024.08-2deepin6) unstable; urgency=medium
       LoongArch gcc and failed with:
         gcc: error: unrecognized argument in option '-march=x86-64'
         error F002: Failed to build module
-    - Gate build-ovmf/build-ovmf32 on DEB_BUILD_ARCH=amd64 so OVMF/OVMF32
+    - Gate build-ovmf/build-ovmf32 on x86 hosts (amd64: build-ovmf +
+      build-ovmf32; i386: build-ovmf32; else: neither) so OVMF/OVMF32
       firmwares continue to be produced on x86 build hosts
+    - Gate the x86-only package install lists (ovmf, ovmf-ia32,
+      efi-shell-x64, efi-shell-ia32) to the x86 architectures via dh-exec
+      [amd64]/[amd64 i386] filters, so dh_install does not fail on non-x86
+      hosts where the OVMF outputs do not exist; binary packages stay
+      Architecture: all
     - qemu-efi-loongarch64, qemu-efi-riscv64, qemu-efi-aarch64 and qemu-efi-arm
       are still built on all architectures
 
